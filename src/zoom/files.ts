@@ -7,7 +7,7 @@ import type { ZoomHttp } from './http.js';
 
 /** Stream recordings rather than buffering multi-GB videos. Partial files are removed. */
 export async function saveZoomFile(http: ZoomHttp, url: string, opts: {
-  dir: string; fileName: string; maxBytes: number; expectedBytes?: number; referer?: string;
+  dir: string; fileName: string; maxBytes: number; expectedBytes?: number; referer?: string; expectedMedia?: 'video' | 'audio';
 }) {
   if (opts.expectedBytes !== undefined && opts.expectedBytes > opts.maxBytes) {
     throw new BlackboardError('BAD_INPUT', 'Zoom file exceeds maxDownloadBytes. Raise the configured ceiling to download it.');
@@ -16,6 +16,9 @@ export async function saveZoomFile(http: ZoomHttp, url: string, opts: {
   const mime = response.headers.get('content-type') ?? 'application/octet-stream';
   if (/text\/html/i.test(mime)) {
     await response.body?.cancel(); throw new BlackboardError('FORBIDDEN', 'Zoom returned a sign-in or permission page instead of a file.');
+  }
+  if (opts.expectedMedia && /^(audio|video)\//i.test(mime) && !mime.toLowerCase().startsWith(opts.expectedMedia + '/')) {
+    await response.body?.cancel(); throw new BlackboardError('UPSTREAM', 'Zoom returned a different media type than the selected file.');
   }
   if (Number(response.headers.get('content-length')) > opts.maxBytes) {
     await response.body?.cancel(); throw new BlackboardError('BAD_INPUT', 'Zoom file exceeds the download size limit.');

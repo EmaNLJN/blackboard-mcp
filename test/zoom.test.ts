@@ -185,3 +185,26 @@ test('download filenames fit byte limits for non-ASCII course names', async () =
   assert.ok(Buffer.byteLength(file.path.split('/').at(-1)!) <= 255);
   assert.ok(file.path.endsWith('.mp4'));
 });
+
+test('a selected audio download rejects a video response before writing', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'bb-zoom-mime-'));
+  const http = new ZoomHttp(source, async () => new Response('video', { headers: { 'content-type': 'video/mp4' } }));
+  await assert.rejects(saveZoomFile(http, 'https://ssrweb.zoom.us/file.mp4', { dir, fileName: 'audio.m4a', expectedMedia: 'audio', maxBytes: 100 }), /different media type/);
+  assert.deepEqual(await readdir(dir), []);
+});
+
+test('meeting detail retains Zoom snake_case dates and selects a recurring occurrence', async () => {
+  const zoom = await ZoomLti.open(source, item, '_1_1', '_2_1', async input => {
+    const url = new URL(String(input));
+    if (url.href === launch) return new Response(form);
+    if (url.pathname === '/lti/rich') return new Response(page);
+    assert.ok(url.pathname.endsWith('/meeting/123456789/recurring/456789'));
+    return json({ id: 123456789, topic: 'Networks', start_time: '2026-11-03T18:45:00', timezone: 'America/Argentina/Buenos_Aires', join_url: 'https://us02web.zoom.us/j/123456789', host_email: 'private@example.edu' });
+  });
+  const r = await zoom.getMeeting('123456789', '456789');
+  assert.equal(r.meetingNumber, '123456789');
+  assert.equal(r.startTimeUtc, undefined);
+  assert.equal(r.startTimeDisplay, '2026-11-03T18:45:00');
+  assert.equal(r.joinUrl, 'https://us02web.zoom.us/j/123456789');
+  assert.ok(!JSON.stringify(r).includes('private@example.edu'));
+});

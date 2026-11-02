@@ -1,10 +1,13 @@
 # Blackboard MCP fork
 
-This fork starts at upstream v0.1.2. The Zoom integration is a separate, read-only
+This fork follows upstream main. The Zoom integration is a separate, read-only
 module; do not broaden `bb_raw_request` or the Blackboard HTTP host allowlist.
 
 - Node >=22.5; TypeScript ESM. `npm install --ignore-scripts`, `npm run build`,
   `npm run typecheck`, `npm test`.
+- Follow the upstream `node:test` fixtures and MCP `registerTool`/`guard` pattern.
+  CI covers Linux, macOS and Windows on the Node versions in `.github/workflows/ci.yml`.
+  Keep Zoom changes independent of Blackboard submissions and other write tools.
 - Keep Zoom LTI authentication, recording downloads, and MCP presentation in
   separate modules. Never evaluate JavaScript returned by the remote service.
 - Only replay the signed LTI launch provided by the enrolled course. Scope

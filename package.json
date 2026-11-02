@@ -43,6 +43,8 @@
   "files": [
     "dist",
     "README.md",
+    "ZOOM.md",
+    "skills",
     "LICENSE"
   ],
   "scripts": {

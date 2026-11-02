@@ -48,8 +48,8 @@ export function registerZoomTools(server: McpServer): void {
   }, guard('bb_zoom_list_meetings', async args => output(await (await connect(args)).zoom.listMeetings(args.kind ?? 'upcoming', args.page))));
   server.registerTool('bb_zoom_get_meeting', {
     title: 'Read Zoom meeting schedule details', description: 'Reads one scheduled Zoom meeting, including its agenda, timezone and recurrence information when exposed. Does not start or join the meeting.',
-    inputSchema: { ...scope, meetingNumber: z.string().regex(/^\d{9,15}$/) }, annotations,
-  }, guard('bb_zoom_get_meeting', async args => output(await (await connect(args)).zoom.getMeeting(args.meetingNumber))));
+    inputSchema: { ...scope, meetingNumber: z.string().regex(/^\d{9,15}$/), occurrenceId: z.string().regex(/^\d{1,30}$/).optional().describe('Recurring occurrence id from bb_zoom_list_meetings, when present.') }, annotations,
+  }, guard('bb_zoom_get_meeting', async args => output(await (await connect(args)).zoom.getMeeting(args.meetingNumber, args.occurrenceId))));
   server.registerTool('bb_zoom_list_recordings', {
     title: 'List course Zoom recordings', description: 'Lists a page of cloud recordings with meetingId, topic, UTC start time, timezone, duration in minutes, file count and total bytes. Use bb_zoom_get_recording for files and player permissions.',
     inputSchema: { ...scope, page, from: date.describe('Start date YYYY-MM-DD.'), to: date.describe('End date YYYY-MM-DD.'), search: z.string().max(200).optional() }, annotations,

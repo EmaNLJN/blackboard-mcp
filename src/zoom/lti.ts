@@ -123,10 +123,15 @@ export class ZoomLti {
     return this.paged(await this.api(`meeting/${kind === 'past' ? 'history' : 'upComing'}/COURSE/all`, { page, total: 0 }), page,
       r => ({ ...pick(r, ['meetingId', 'meetingNumber', 'topic', 'agenda', 'startTimeStr', 'listStartTime', 'timezone', 'duration', 'type', 'recurring', 'occurrenceId', 'joinUrl']), startTimeUtc: utc(r.startTime), startTimeDisplay: utc(r.startTime) ? undefined : str(r.startTime), durationUnit: 'minutes' }));
   }
-  async getMeeting(meetingNumber: string) {
+  async getMeeting(meetingNumber: string, occurrenceId?: string) {
     if (!/^\d{9,15}$/.test(meetingNumber)) throw new BlackboardError('BAD_INPUT', 'Use the meetingNumber returned by bb_zoom_list_meetings.');
-    const r = await this.api(`meeting/${meetingNumber}`);
-    return { ...pick(r, ['meetingNumber', 'topic', 'agenda', 'timezone', 'duration', 'type', 'recurrence', 'occurrences', 'joinUrl']), startTimeUtc: utc(r.startTime), startTimeDisplay: utc(r.startTime) ? undefined : str(r.startTime), durationUnit: 'minutes' };
+    if (occurrenceId && !/^\d{1,30}$/.test(occurrenceId)) throw new BlackboardError('BAD_INPUT', 'Use the occurrenceId returned by bb_zoom_list_meetings.');
+    const r = await this.api(`meeting/${meetingNumber}${occurrenceId ? '/recurring/' + occurrenceId : ''}`);
+    const start = r.startTime ?? r.start_time;
+    // Detail start_time may be local ISO text; only explicit offsets establish UTC.
+    const startUtc = r.startTime ? utc(r.startTime) : /T.*(?:Z|[+-]\d\d:\d\d)$/.test(str(start)) ? str(start) : undefined;
+    return { ...pick(r, ['topic', 'agenda', 'timezone', 'duration', 'type', 'recurrence', 'occurrences']), meetingNumber,
+      joinUrl: r.joinUrl ?? r.join_url, startTimeUtc: startUtc, startTimeDisplay: startUtc ? undefined : str(start), durationUnit: 'minutes' };
   }
   async listSummaries(paginationKey?: string) {
     const r = await this.api('aic/meetingsummaries', { paginationKey, ascending: paginationKey ? 'true' : undefined });
@@ -209,6 +214,7 @@ export class ZoomLti {
     if (!url) throw new BlackboardError('NOT_FOUND', 'Zoom did not provide a downloadable file.');
     assertMediaUrl(url);
     const ext = ({ MP4: 'mp4', M4A: 'm4a', TRANSCRIPT: 'vtt', CHAT: 'txt', TIMELINE: 'json' } as Record<string, string>)[str(f.fileType)] ?? 'bin';
-    return { url, referer, source, expectedBytes: typeof f.fileSize === 'number' ? f.fileSize : undefined, fileName: `${str(r.topic)}-${str(f.recordingStart)}-${str(f.id)}.${ext}` };
+    const expectedMedia = f.fileType === 'MP4' ? 'video' as const : f.fileType === 'M4A' ? 'audio' as const : undefined;
+    return { url, referer, source, expectedMedia, expectedBytes: typeof f.fileSize === 'number' ? f.fileSize : undefined, fileName: `${str(r.topic)}-${str(f.recordingStart)}-${str(f.id)}.${ext}` };
   }
 }
