@@ -5,6 +5,7 @@ import { registerFileTools } from './files.js';
 import { registerGradeTools } from './grades.js';
 import { registerDeadlineTools } from './deadlines.js';
 import { registerCommsTools } from './comms.js';
+import { registerZoomTools } from './zoom.js';
 import { registerRawTools } from './raw.js';
 
 export function registerAllTools(server: McpServer): void {
@@ -15,6 +16,7 @@ export function registerAllTools(server: McpServer): void {
   registerDeadlineTools(server);
   registerCommsTools(server);
   registerRawTools(server);
+  registerZoomTools(server);
 }
 
 export * from './helpers.js';

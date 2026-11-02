@@ -1,5 +1,10 @@
 # blackboard-mcp
 
+This fork adds [Zoom course integration](ZOOM.md): class schedules, recordings,
+video/audio downloads, timestamped transcripts and shared meeting summaries.
+Use the local installation in that guide; the upstream npm package does not
+include these tools.
+
 An [MCP](https://modelcontextprotocol.io) server for Blackboard Learn (Ultra). Gives Claude, Codex, Cursor and any other MCP client read access to your courses, content, files, grades, deadlines, announcements and discussions, using your own browser session.
 
 ```bash
