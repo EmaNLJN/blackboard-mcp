@@ -103,6 +103,8 @@ test('lists every tool group without a stored session', async () => {
     'bb_list_grades', 'bb_get_grade_detail', 'bb_grade_summary',
     'bb_todo', 'bb_calendar', 'bb_announcements', 'bb_activity_stream',
     'bb_raw_request', 'bb_batch_request', 'bb_list_endpoints',
+    'bb_zoom_list_recordings', 'bb_zoom_get_recording',
+    'bb_zoom_read_transcript', 'bb_zoom_download_file',
   ]) {
     assert.ok(
       tools.some((t) => t.name === expected),

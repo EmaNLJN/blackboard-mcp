@@ -49,6 +49,8 @@ export function createServer(): McpServer {
         '  - "read this document"      -> bb_read_file (pages through long PDFs)',
         '  - "how am I doing?"         -> bb_grade_summary, then bb_list_grades',
         '  - "what did the instructor say?" -> bb_get_grade_detail (feedback lives here)',
+        '  - \"Zoom classes or recordings\" -> bb_zoom_sections, bb_zoom_list_meetings, bb_zoom_list_recordings',
+        '  - \"read a class transcript\" -> bb_zoom_read_transcript',
         '  - anything unmodelled      -> bb_list_endpoints, then bb_raw_request',
         '',
         'The server is read-only unless BLACKBOARD_MCP_ALLOW_WRITES=1 is set.',
