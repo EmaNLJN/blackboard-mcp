@@ -16,5 +16,5 @@ module; do not broaden `bb_raw_request` or the Blackboard HTTP host allowlist.
   Verify redirects, size limits, permission failures, dates and pagination.
 - Do not commit cookies, tokens, signed URLs, real course data, downloads, browser
   captures, local configuration or machine-specific paths.
-- `skills/blackboard-zoom/SKILL.md` documents tool routing and limitations.
-  `ZOOM.md` documents installation and the supported Zoom LTI 1.1 surface.
+- `ZOOM.md` documents installation, tool routing and the supported Zoom LTI 1.1 surface.
+  Personal agent skills and client configuration belong in user dotfiles, not this project.

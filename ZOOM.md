@@ -36,11 +36,6 @@ The existing encrypted Blackboard session is reused. Check that the effective
 `allowWrites` setting is false if you want the entire server to remain read-only;
 this fork's Zoom tools never expose meeting edits, submissions or deletions.
 
-The optional reusable skill is `skills/blackboard-zoom/SKILL.md`. Copy its folder
-into your client's skill directory (for example `~/.agents/skills` for Codex),
-or manage that copy with your existing dotfiles tool. It contains no course IDs,
-credentials or machine paths. A skill alone does not install an MCP server.
-
 ## Tools
 
 All tools accept `courseId`. `contentId` is optional unless multiple Zoom
